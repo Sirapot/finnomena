@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"regexp"
+	"strconv"
 	"time"
 )
 
@@ -25,7 +27,8 @@ func main() {
 // -----------------------------------------------------
 
 func SelectTimeFrame() int {
-	var timeFrame int
+	var timeFrameInput string
+	var timeFrameResult int
 	fmt.Println("=======================================================================")
 	fmt.Println("	                     SCANNER SIGNAL								    ")
 	fmt.Println("=======================================================================")
@@ -35,12 +38,24 @@ func SelectTimeFrame() int {
 	fmt.Println("Type 4 :                                                             1Y")
 	fmt.Println("=======================================================================")
 	fmt.Printf("Please select type to scanner 1, 2, 3, 4 : ")
-	n, err := fmt.Scanf("%d\n", &timeFrame)
+	n, err := fmt.Scanf("%s\n", &timeFrameInput)
 	if err != nil || n == 0 {
 		fmt.Println(n, err)
 	}
+	if len(timeFrameInput) != 1 {
+		return 0
+	}
+
+	// regex
+	numberRegexp := regexp.MustCompile(`[1-4]{1}`)
+	timeFrameRegex := numberRegexp.FindString(timeFrameInput)
+	timeFrameResult, err = strconv.Atoi(timeFrameRegex)
+	if err != nil {
+		fmt.Println(n, err)
+	}
 	fmt.Println("=======================================================================")
-	return timeFrame
+
+	return timeFrameResult
 }
 
 func GetApiStockData(timeFrame int) {
@@ -54,7 +69,7 @@ func GetApiStockData(timeFrame int) {
 		if err != nil {
 			fmt.Println(err.Error())
 		}
-		if (response.StatusCode == http.StatusNotFound){
+		if response.StatusCode == http.StatusNotFound {
 			fmt.Println("Not found")
 		}
 
